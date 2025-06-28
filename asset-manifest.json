@@ -1,10 +1,10 @@
 {
   "files": {
-    "main.css": "/your-repo-name/static/css/main.0fb9c689.css",
-    "main.js": "/your-repo-name/static/js/main.231c7299.js",
-    "index.html": "/your-repo-name/index.html",
-    "main.0fb9c689.css.map": "/your-repo-name/static/css/main.0fb9c689.css.map",
-    "main.231c7299.js.map": "/your-repo-name/static/js/main.231c7299.js.map"
+    "main.css": "/citizen-app/static/css/main.0fb9c689.css",
+    "main.js": "/citizen-app/static/js/main.231c7299.js",
+    "index.html": "/citizen-app/index.html",
+    "main.0fb9c689.css.map": "/citizen-app/static/css/main.0fb9c689.css.map",
+    "main.231c7299.js.map": "/citizen-app/static/js/main.231c7299.js.map"
   },
   "entrypoints": [
     "static/css/main.0fb9c689.css",
