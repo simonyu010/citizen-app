@@ -1,7 +1,7 @@
-# Citizen Flashcards App
+# 鱼蛋妈妈的公民考试
 
 ## Overview
-The Citizen Flashcards App is a mobile-friendly web application designed to help users learn and review important questions and answers related to U.S. citizenship. The app features interactive flashcards that display questions in both English and a second language, allowing users to test their knowledge effectively.
+The 鱼蛋妈妈的公民考试 is a mobile-friendly web application designed to help users learn and review important questions and answers related to U.S. citizenship. The app features interactive flashcards that display questions in both English and a second language, allowing users to test their knowledge effectively.
 
 ## Features
 1. **Flash Cards**: 
@@ -35,7 +35,7 @@ citizen-flashcards-app
 ```
 
 ## Installation
-To get started with the Citizen Flashcards App, follow these steps:
+To get started with the 鱼蛋妈妈的公民考试, follow these steps:
 
 1. Clone the repository:
    ```

@@ -26,8 +26,8 @@ const FlashCardViewer: React.FC = () => {
         onShowAnswer={handleShowAnswer}
       />
       <div style={{ marginTop: 16 }}>
-        <button onClick={handlePrev}>Previous</button>
-        <button onClick={handleNext}>Next</button>
+        <button onClick={handlePrev}>上一题</button>
+        <button onClick={handleNext}>下一题</button>
       </div>
       <div style={{ marginTop: 8, fontSize: '0.9em', color: '#888' }}>
         {index + 1} / {questionsData.length}

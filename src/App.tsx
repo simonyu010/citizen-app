@@ -16,11 +16,11 @@ const App: React.FC = () => {
     <Layout>
       <div style={{ display: 'flex', gap: '1em', marginBottom: '1em' }}>
         <button onClick={toggleRandom}>
-          {showRandom ? 'Show All Questions' : 'Show Random 10 Questions'}
+          {showRandom ? '全部题目' : '随机10题'}
         </button>
         {showRandom && (
           <button onClick={() => setRandomKey(k => k + 1)}>
-            Another Random 10
+            再来10题
           </button>
         )}
       </div>
