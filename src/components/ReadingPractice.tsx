@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import writingData from '../data/writing.json';
+import readingData from '../data/reading.json';
 
-interface WritingItem {
+interface ReadingItem {
   id: number;
-  write: string;
+  read: string;
 }
 
-const WritingPractice: React.FC = () => {
+const ReadingPractice: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [shuffled, setShuffled] = useState<WritingItem[]>([]);
+  const [shuffled, setShuffled] = useState<ReadingItem[]>([]);
 
   useEffect(() => {
-    // Shuffle the writing data once on mount
-    const shuffledData = [...(writingData as WritingItem[])]
+    // Shuffle the reading data once on mount
+    const shuffledData = [...(readingData as ReadingItem[])]
       .sort(() => Math.random() - 0.5);
     setShuffled(shuffledData);
     setCurrentIndex(0);
@@ -20,33 +20,25 @@ const WritingPractice: React.FC = () => {
 
   useEffect(() => {
     if (shuffled.length > 0) {
-      speakSentence(shuffled[currentIndex].write);
+      speakWord(shuffled[currentIndex].read);
     }
     // eslint-disable-next-line
   }, [currentIndex, shuffled]);
 
-
-  const speakSentence = (sentence: string) => {
+  const speakWord = (word: string) => {
     if ('speechSynthesis' in window) {
-      const utter = new window.SpeechSynthesisUtterance(sentence);
+      const utter = new window.SpeechSynthesisUtterance(word);
       utter.lang = 'en-US';
       window.speechSynthesis.cancel();
       window.speechSynthesis.speak(utter);
     }
   };
 
-
-  useEffect(() => {
-    const replayListener = () => {
-      if (shuffled.length > 0) {
-        speakSentence(shuffled[currentIndex].write);
-      }
-    };
-    window.addEventListener('writing-replay', replayListener);
-    return () => {
-      window.removeEventListener('writing-replay', replayListener);
-    };
-  }, [shuffled, currentIndex]);
+  const handleReplay = () => {
+    if (shuffled.length > 0) {
+      speakWord(shuffled[currentIndex].read);
+    }
+  };
 
   const handlePrev = () => {
     setCurrentIndex((prev) => (prev === 0 ? shuffled.length - 1 : prev - 1));
@@ -59,9 +51,9 @@ const WritingPractice: React.FC = () => {
   if (shuffled.length === 0) return <div>Loading...</div>;
 
   return (
-    <div className="writing-practice">
+    <div className="reading-practice">
       <div
-        className="sentence-box"
+        className="word-box"
         style={{
           background: '#f9f9f9',
           border: '2px solid #4a90e2',
@@ -77,19 +69,19 @@ const WritingPractice: React.FC = () => {
           overflowWrap: 'break-word',
           cursor: 'pointer',
         }}
-        onClick={() => speakSentence(shuffled[currentIndex].write)}
-        title="点击句子再听一次"
+        onClick={() => speakWord(shuffled[currentIndex].read)}
+        title="点击单词再读一遍"
       >
-        <span style={{ fontSize: '1.2em', color: '#333', fontWeight: 500, lineHeight: 1.5, display: 'block' }}>
-          {shuffled[currentIndex].write}
+        <span style={{ fontSize: '1.4em', color: '#333', fontWeight: 500, lineHeight: 1.5, display: 'block' }}>
+          {shuffled[currentIndex].read}
         </span>
       </div>
       <div style={{ marginTop: 20, display: 'flex', gap: '10px', justifyContent: 'center' }}>
-        <button onClick={handlePrev}>上一题</button>
-        <button onClick={handleNext}>下一题</button>
+        <button onClick={handlePrev}>上个词</button>
+        <button onClick={handleNext}>下个词</button>
       </div>
     </div>
   );
 };
 
-export default WritingPractice;
+export default ReadingPractice;

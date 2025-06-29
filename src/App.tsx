@@ -3,11 +3,12 @@ import React, { useState } from 'react';
 import FlashCardViewer from './components/FlashCardViewer';
 import RandomTen from './components/RandomTen';
 import WritingPractice from './components/WritingPractice';
+import ReadingPractice from './components/ReadingPractice';
 import Layout from './components/Layout';
 import questionsData from './data/questions.json';
 
 
-type Mode = 'all' | 'random' | 'writing';
+type Mode = 'all' | 'random' | 'writing' | 'reading';
 
 const App: React.FC = () => {
   const [mode, setMode] = useState<Mode>('all');
@@ -34,22 +35,36 @@ const App: React.FC = () => {
             <button onClick={() => setMode('writing')}>
               我读你写
             </button>
+            <button onClick={() => setMode('reading')}>
+              跟我读
+            </button>
           </>
         )}
         {mode === 'writing' && (
-          <button onClick={() => window.dispatchEvent(new CustomEvent('writing-replay'))}>
-            再听一次
+          <button onClick={() => setMode('reading')}>
+            跟我读
           </button>
         )}
-        {mode !== 'random' && mode !== 'writing' && (
+        {mode === 'reading' && (
           <button onClick={() => setMode('writing')}>
             我读你写
           </button>
         )}
+        {mode !== 'random' && mode !== 'writing' && mode !== 'reading' && (
+          <>
+            <button onClick={() => setMode('writing')}>
+              我读你写
+            </button>
+            <button onClick={() => setMode('reading')}>
+              跟我读
+            </button>
+          </>
+        )}
       </div>
-      {mode === 'random' && <RandomTen key={randomKey} questions={questionsData} />}
-      {mode === 'all' && <FlashCardViewer />}
-      {mode === 'writing' && <WritingPractice />}
+      {mode === 'random' && <RandomTen key={randomKey} questions={questionsData} />} 
+      {mode === 'all' && <FlashCardViewer />} 
+      {mode === 'writing' && <WritingPractice />} 
+      {mode === 'reading' && <ReadingPractice />} 
     </Layout>
   );
 };
