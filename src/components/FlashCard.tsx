@@ -17,8 +17,12 @@ const speakText = (text: string) => {
       const voices = window.speechSynthesis.getVoices();
       const utter = new window.SpeechSynthesisUtterance(text);
       utter.lang = 'en-US';
-      const voiceObj = voices.find(v => v.name === 'Google US English' && v.lang === 'en-US');
-      if (voiceObj) utter.voice = voiceObj;
+        let voiceObj = voices.find((v: SpeechSynthesisVoice) => v.name === 'Google US English' && v.lang === 'en-US');
+        if (!voiceObj) {
+          // Fallback to first en-US voice
+          voiceObj = voices.find((v: SpeechSynthesisVoice) => v.lang === 'en-US');
+        }
+        if (voiceObj) utter.voice = voiceObj;
       window.speechSynthesis.cancel();
       window.speechSynthesis.speak(utter);
     };
