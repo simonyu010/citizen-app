@@ -22,7 +22,10 @@ const speakText = (text: string) => {
       const voices = getEnglishVoices();
       const utter = new window.SpeechSynthesisUtterance(text);
       utter.lang = 'en-US';
-      let voiceObj = voices.find(v => v.name === 'Google US English' && v.lang === 'en-US');
+      let voiceObj = voices.find(v => v.name === 'Aaron' && v.lang === 'en-US');
+      if (!voiceObj) {
+        voiceObj = voices.find(v => v.name === 'Nicky' && v.lang === 'en-US');
+      }
       if (!voiceObj) {
         voiceObj = voices.find(v => v.lang === 'en-US');
       }
@@ -30,12 +33,10 @@ const speakText = (text: string) => {
       window.speechSynthesis.cancel();
       window.speechSynthesis.speak(utter);
     };
-    // If voices are not loaded, wait for voiceschanged event
     if (getEnglishVoices().length === 0) {
       window.speechSynthesis.onvoiceschanged = () => {
         trySpeak();
       };
-      // Trigger loading voices
       window.speechSynthesis.getVoices();
     } else {
       trySpeak();
