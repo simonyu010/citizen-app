@@ -84,39 +84,21 @@ const WritingPractice: React.FC = () => {
     setCurrentIndex((prev) => (prev === shuffled.length - 1 ? 0 : prev + 1));
   };
 
-  if (shuffled.length === 0) return <div>Loading...</div>;
+if (shuffled.length === 0) return <div>Loading...</div>;
+
   return (
-    <div className="writing-practice">
-      <div style={{ marginBottom: 8, color: '#888', fontSize: '0.95em', textAlign: 'center' }}>
-        当前语音: {currentVoiceName || '未播放'}
-      </div>
-      <div
-        className="sentence-box"
-        style={{
-          background: '#f9f9f9',
-          border: '2px solid #4a90e2',
-          borderRadius: '12px',
-          padding: '1.2em',
-          margin: '1.5em auto',
-          maxWidth: '98vw',
-          width: '100%',
-          boxSizing: 'border-box',
-          boxShadow: '0 2px 12px rgba(74,144,226,0.08)',
-          textAlign: 'center',
-          wordBreak: 'break-word',
-          overflowWrap: 'break-word',
-          cursor: 'pointer',
-        }}
-        onClick={() => speakSentence(shuffled[currentIndex].write)}
-        title="点击句子再听一次"
-      >
-        <span style={{ fontSize: '1.2em', color: '#333', fontWeight: 500, lineHeight: 1.5, display: 'block' }}>
+    <div style={{ textAlign: 'center', marginTop: 40 }}>
+      <div>
+        <span style={{ fontSize: 24, fontWeight: 'bold' }}>
           {shuffled[currentIndex].write}
         </span>
       </div>
       <div style={{ marginTop: 20, display: 'flex', gap: '10px', justifyContent: 'center' }}>
         <button onClick={handlePrev}>上一题</button>
         <button onClick={handleNext}>下一题</button>
+      </div>
+      <div style={{ marginTop: 10 }}>
+        当前语音: {currentVoiceName}
       </div>
     </div>
   );

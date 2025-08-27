@@ -22,30 +22,11 @@ const FlashCard: React.FC<FlashCardProps> = ({ question, answer, translation, tr
 
   const speakText = (text: string) => {
     if ('speechSynthesis' in window) {
-      const speak = () => {
-        const voices = window.speechSynthesis.getVoices();
-        const utter = new window.SpeechSynthesisUtterance(text);
-        utter.lang = 'en-US';
-        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-        let voiceObj: SpeechSynthesisVoice | null = null;
-        if (!isIOS) {
-          voiceObj = voices.find(v => v.name === 'Aaron' && v.lang === 'en-US') ||
-            voices.find(v => v.name === 'Nicky' && v.lang === 'en-US') ||
-            voices.find(v => v.lang === 'en-US') || null;
-          if (voiceObj) utter.voice = voiceObj;
-        }
-        setCurrentVoiceName(getVoiceName(voiceObj, isIOS));
-        window.speechSynthesis.cancel();
-        window.speechSynthesis.speak(utter);
-      };
-      if (window.speechSynthesis.getVoices().length === 0) {
-        window.speechSynthesis.onvoiceschanged = () => {
-          speak();
-        };
-        window.speechSynthesis.getVoices();
-      } else {
-        speak();
-      }
+      const utter = new window.SpeechSynthesisUtterance(text);
+      utter.lang = 'en-US';
+      setCurrentVoiceName('System Default');
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(utter);
     }
   };
 

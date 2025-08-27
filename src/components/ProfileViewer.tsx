@@ -13,34 +13,10 @@ interface IA {
 
 const speakText = (text: string) => {
   if ('speechSynthesis' in window) {
-    const speak = () => {
-      const voices = window.speechSynthesis.getVoices();
-      const utter = new window.SpeechSynthesisUtterance(text);
-      utter.lang = 'en-US';
-      // Detect iOS (Safari engine)
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-      if (!isIOS) {
-        let voiceObj = voices.find(v => v.name === 'Aaron' && v.lang === 'en-US');
-        if (!voiceObj) {
-          voiceObj = voices.find(v => v.name === 'Nicky' && v.lang === 'en-US');
-        }
-        if (!voiceObj) {
-          voiceObj = voices.find(v => v.lang === 'en-US');
-        }
-        if (voiceObj) utter.voice = voiceObj;
-      }
-      // On iOS, do not set utter.voice (let system pick best voice)
-      window.speechSynthesis.cancel();
-      window.speechSynthesis.speak(utter);
-    };
-    if (window.speechSynthesis.getVoices().length === 0) {
-      window.speechSynthesis.onvoiceschanged = () => {
-        speak();
-      };
-      window.speechSynthesis.getVoices();
-    } else {
-      speak();
-    }
+    const utter = new window.SpeechSynthesisUtterance(text);
+    utter.lang = 'en-US';
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utter);
   }
 };
 
@@ -75,16 +51,28 @@ const ProfileViewer: React.FC = () => {
       >
         {currentQ.identityQuestions}
       </div>
-      {showAnswerMap[currentQ.id] && (
-        <div
-          className="profile-answer"
-          style={{ cursor: 'pointer', fontSize: '1.1em', color: '#6a1b9a', background: '#f3e5f5', padding: '1em', borderRadius: '10px', marginBottom: '1em' }}
-          title="点击朗读答案"
-          onClick={handleAnswerClick}
-        >
-          {currentA ? currentA.identityAnswers : '无答案'}
-        </div>
-      )}
+      <div
+        className="profile-answer"
+        style={{
+          cursor: showAnswerMap[currentQ.id] ? 'pointer' : 'default',
+          fontSize: '1.1em',
+          color: '#6a1b9a',
+          background: '#f3e5f5',
+          padding: '1em',
+          borderRadius: '10px',
+          marginBottom: '1em',
+          minHeight: '2.5em',
+          visibility: showAnswerMap[currentQ.id] ? 'visible' : 'hidden',
+          transition: 'visibility 0.2s',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+        title={showAnswerMap[currentQ.id] ? '点击朗读答案' : undefined}
+        onClick={showAnswerMap[currentQ.id] ? handleAnswerClick : undefined}
+      >
+        {currentA ? currentA.identityAnswers : '无答案'}
+      </div>
       <div style={{ marginTop: 16 }}>
         <button style={{ background: '#d32f2f', color: '#fff', border: 'none', borderRadius: 6, padding: '0.6em 1.2em', marginRight: 8 }} onClick={handlePrev}>上一题</button>
         <button style={{ background: '#8e24aa', color: '#fff', border: 'none', borderRadius: 6, padding: '0.6em 1.2em' }} onClick={handleNext}>下一题</button>

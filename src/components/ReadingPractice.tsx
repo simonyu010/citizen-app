@@ -35,32 +35,15 @@ const ReadingPractice: React.FC = () => {
     // eslint-disable-next-line
   }, [currentIndex, shuffled]);
 
-  const speakWord = (word: string) => {
-    if ('speechSynthesis' in window) {
-      const utter = new window.SpeechSynthesisUtterance(word);
-      utter.lang = 'en-US';
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-      let voiceName = '';
-      if (!isIOS) {
-        let voiceObj = voices.find(v => v.name === 'Aaron' && v.lang === 'en-US');
-        if (!voiceObj) {
-          voiceObj = voices.find(v => v.name === 'Nicky' && v.lang === 'en-US');
-        }
-        if (!voiceObj) {
-          voiceObj = voices.find(v => v.lang === 'en-US');
-        }
-        if (voiceObj) {
-          utter.voice = voiceObj;
-          voiceName = voiceObj.name + ' (' + voiceObj.lang + ')';
-        }
-      } else {
-        voiceName = '系统默认';
+    const speakWord = (word: string) => {
+      if ('speechSynthesis' in window) {
+        const utter = new window.SpeechSynthesisUtterance(word);
+        utter.lang = 'en-US';
+        setCurrentVoiceName('System Default');
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(utter);
       }
-      setCurrentVoiceName(voiceName);
-      window.speechSynthesis.cancel();
-      window.speechSynthesis.speak(utter);
-    }
-  };
+    };
 
   const handleReplay = () => {
     if (shuffled.length > 0) {
