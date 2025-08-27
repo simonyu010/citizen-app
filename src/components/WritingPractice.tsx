@@ -38,26 +38,19 @@ const WritingPractice: React.FC = () => {
 
   const speakSentence = (sentence: string) => {
     if ('speechSynthesis' in window) {
+      const voices = window.speechSynthesis.getVoices();
       const utter = new window.SpeechSynthesisUtterance(sentence);
       utter.lang = 'en-US';
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-      let voiceName = '';
-      if (!isIOS) {
-        let voiceObj = voices.find(v => v.name === 'Aaron' && v.lang === 'en-US');
-        if (!voiceObj) {
-          voiceObj = voices.find(v => v.name === 'Nicky' && v.lang === 'en-US');
-        }
-        if (!voiceObj) {
-          voiceObj = voices.find(v => v.lang === 'en-US');
-        }
-        if (voiceObj) {
-          utter.voice = voiceObj;
-          voiceName = voiceObj.name + ' (' + voiceObj.lang + ')';
-        }
-      } else {
-        voiceName = '系统默认';
+      let googleVoice = voices.find(v => v.name.includes('Google US English') && v.lang === 'en-US');
+      if (!googleVoice) {
+        googleVoice = voices.find(v => v.lang === 'en-US');
       }
-      setCurrentVoiceName(voiceName);
+      if (googleVoice) {
+        utter.voice = googleVoice;
+        setCurrentVoiceName(googleVoice.name);
+      } else {
+        setCurrentVoiceName('System Default');
+      }
       window.speechSynthesis.cancel();
       window.speechSynthesis.speak(utter);
     }

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>iOS Speech Synthesis Test</title>
+  <style>
+    body { font-family: sans-serif; padding: 2em; }
+    #result { margin-top: 1em; color: #888; }
+    button { font-size: 1.1em; padding: 0.5em 1em; }
+    input { font-size: 1.1em; padding: 0.3em; width: 80%; }
+  </style>
+</head>
+<body>
+  <h2>iOS Speech Synthesis Test</h2>
+  <p>Enter text below and tap "Speak" to test the browser's speech synthesis voice.</p>
+  <input id="text" type="text" value="Hello, this is a test sentence." />
+  <button onclick="speak()">Speak</button>
+  <div id="result"></div>
+  <script>
+    function speak() {
+      var text = document.getElementById('text').value;
+      var utter = new window.SpeechSynthesisUtterance(text);
+      utter.lang = 'en-US';
+      utter.onstart = function() {
+        document.getElementById('result').textContent = 'Speaking...';
+      };
+      utter.onend = function() {
+        document.getElementById('result').textContent = 'Done.';
+      };
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(utter);
+    }
+  </script>
+</body>
+</html>

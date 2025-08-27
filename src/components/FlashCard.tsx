@@ -22,9 +22,19 @@ const FlashCard: React.FC<FlashCardProps> = ({ question, answer, translation, tr
 
   const speakText = (text: string) => {
     if ('speechSynthesis' in window) {
+      const voices = window.speechSynthesis.getVoices();
       const utter = new window.SpeechSynthesisUtterance(text);
       utter.lang = 'en-US';
-      setCurrentVoiceName('System Default');
+      let googleVoice = voices.find(v => v.name.includes('Google US English') && v.lang === 'en-US');
+      if (!googleVoice) {
+        googleVoice = voices.find(v => v.lang === 'en-US');
+      }
+      if (googleVoice) {
+        utter.voice = googleVoice;
+        setCurrentVoiceName(googleVoice.name);
+      } else {
+        setCurrentVoiceName('System Default');
+      }
       window.speechSynthesis.cancel();
       window.speechSynthesis.speak(utter);
     }
