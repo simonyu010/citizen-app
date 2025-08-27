@@ -11,35 +11,35 @@ interface IA {
   identityAnswers: string;
 }
 
-const getEnglishVoices = () => {
-  if (!('speechSynthesis' in window)) return [];
-  return window.speechSynthesis.getVoices().filter(v => v.lang && v.lang.startsWith('en'));
-};
-
 const speakText = (text: string) => {
   if ('speechSynthesis' in window) {
-    const trySpeak = () => {
-      const voices = getEnglishVoices();
+    const speak = () => {
+      const voices = window.speechSynthesis.getVoices();
       const utter = new window.SpeechSynthesisUtterance(text);
       utter.lang = 'en-US';
-      let voiceObj = voices.find(v => v.name === 'Aaron' && v.lang === 'en-US');
-      if (!voiceObj) {
-        voiceObj = voices.find(v => v.name === 'Nicky' && v.lang === 'en-US');
+      // Detect iOS (Safari engine)
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      if (!isIOS) {
+        let voiceObj = voices.find(v => v.name === 'Aaron' && v.lang === 'en-US');
+        if (!voiceObj) {
+          voiceObj = voices.find(v => v.name === 'Nicky' && v.lang === 'en-US');
+        }
+        if (!voiceObj) {
+          voiceObj = voices.find(v => v.lang === 'en-US');
+        }
+        if (voiceObj) utter.voice = voiceObj;
       }
-      if (!voiceObj) {
-        voiceObj = voices.find(v => v.lang === 'en-US');
-      }
-      if (voiceObj) utter.voice = voiceObj;
+      // On iOS, do not set utter.voice (let system pick best voice)
       window.speechSynthesis.cancel();
       window.speechSynthesis.speak(utter);
     };
-    if (getEnglishVoices().length === 0) {
+    if (window.speechSynthesis.getVoices().length === 0) {
       window.speechSynthesis.onvoiceschanged = () => {
-        trySpeak();
+        speak();
       };
       window.speechSynthesis.getVoices();
     } else {
-      trySpeak();
+      speak();
     }
   }
 };
@@ -47,7 +47,6 @@ const speakText = (text: string) => {
 const ProfileViewer: React.FC = () => {
   const [index, setIndex] = useState(0);
   const [showAnswerMap, setShowAnswerMap] = useState<{ [key: number]: boolean }>({});
-  // No voice picker needed
 
   const handleNext = () => setIndex((prev) => (prev + 1) % identityQuestions.length);
   const handlePrev = () => setIndex((prev) => (prev - 1 + identityQuestions.length) % identityQuestions.length);

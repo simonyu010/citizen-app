@@ -38,9 +38,17 @@ const ReadingPractice: React.FC = () => {
     if ('speechSynthesis' in window) {
       const utter = new window.SpeechSynthesisUtterance(word);
       utter.lang = 'en-US';
-      // Always use Google US English (en-US) if available
-      const voiceObj = voices.find(v => v.name === 'Google US English' && v.lang === 'en-US');
-      if (voiceObj) utter.voice = voiceObj;
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      if (!isIOS) {
+        let voiceObj = voices.find(v => v.name === 'Aaron' && v.lang === 'en-US');
+        if (!voiceObj) {
+          voiceObj = voices.find(v => v.name === 'Nicky' && v.lang === 'en-US');
+        }
+        if (!voiceObj) {
+          voiceObj = voices.find(v => v.lang === 'en-US');
+        }
+        if (voiceObj) utter.voice = voiceObj;
+      }
       window.speechSynthesis.cancel();
       window.speechSynthesis.speak(utter);
     }

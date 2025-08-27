@@ -17,12 +17,19 @@ const speakText = (text: string) => {
       const voices = window.speechSynthesis.getVoices();
       const utter = new window.SpeechSynthesisUtterance(text);
       utter.lang = 'en-US';
-        let voiceObj = voices.find((v: SpeechSynthesisVoice) => v.name === 'Google US English' && v.lang === 'en-US');
+      // Detect iOS (Safari engine)
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      if (!isIOS) {
+        let voiceObj = voices.find(v => v.name === 'Aaron' && v.lang === 'en-US');
         if (!voiceObj) {
-          // Fallback to first en-US voice
-          voiceObj = voices.find((v: SpeechSynthesisVoice) => v.lang === 'en-US');
+          voiceObj = voices.find(v => v.name === 'Nicky' && v.lang === 'en-US');
+        }
+        if (!voiceObj) {
+          voiceObj = voices.find(v => v.lang === 'en-US');
         }
         if (voiceObj) utter.voice = voiceObj;
+      }
+      // On iOS, do not set utter.voice (let system pick best voice)
       window.speechSynthesis.cancel();
       window.speechSynthesis.speak(utter);
     };
@@ -30,7 +37,6 @@ const speakText = (text: string) => {
       window.speechSynthesis.onvoiceschanged = () => {
         speak();
       };
-      // Trigger loading voices
       window.speechSynthesis.getVoices();
     } else {
       speak();
