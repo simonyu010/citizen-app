@@ -11,24 +11,34 @@ interface IA {
   identityAnswers: string;
 }
 
+const getEnglishVoices = () => {
+  if (!('speechSynthesis' in window)) return [];
+  return window.speechSynthesis.getVoices().filter(v => v.lang && v.lang.startsWith('en'));
+};
+
 const speakText = (text: string) => {
   if ('speechSynthesis' in window) {
-    const speak = () => {
-      const voices = window.speechSynthesis.getVoices();
+    const trySpeak = () => {
+      const voices = getEnglishVoices();
       const utter = new window.SpeechSynthesisUtterance(text);
       utter.lang = 'en-US';
-      const voiceObj = voices.find(v => v.name === 'Google US English' && v.lang === 'en-US');
+      let voiceObj = voices.find(v => v.name === 'Google US English' && v.lang === 'en-US');
+      if (!voiceObj) {
+        voiceObj = voices.find(v => v.lang === 'en-US');
+      }
       if (voiceObj) utter.voice = voiceObj;
       window.speechSynthesis.cancel();
       window.speechSynthesis.speak(utter);
     };
-    if (window.speechSynthesis.getVoices().length === 0) {
+    // If voices are not loaded, wait for voiceschanged event
+    if (getEnglishVoices().length === 0) {
       window.speechSynthesis.onvoiceschanged = () => {
-        speak();
+        trySpeak();
       };
+      // Trigger loading voices
       window.speechSynthesis.getVoices();
     } else {
-      speak();
+      trySpeak();
     }
   }
 };
@@ -36,6 +46,7 @@ const speakText = (text: string) => {
 const ProfileViewer: React.FC = () => {
   const [index, setIndex] = useState(0);
   const [showAnswerMap, setShowAnswerMap] = useState<{ [key: number]: boolean }>({});
+  // No voice picker needed
 
   const handleNext = () => setIndex((prev) => (prev + 1) % identityQuestions.length);
   const handlePrev = () => setIndex((prev) => (prev - 1 + identityQuestions.length) % identityQuestions.length);
