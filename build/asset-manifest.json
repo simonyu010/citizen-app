@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/citizen-app/static/css/main.0fb9c689.css",
-    "main.js": "/citizen-app/static/js/main.a6b02404.js",
+    "main.js": "/citizen-app/static/js/main.550796b8.js",
     "index.html": "/citizen-app/index.html",
     "main.0fb9c689.css.map": "/citizen-app/static/css/main.0fb9c689.css.map",
-    "main.a6b02404.js.map": "/citizen-app/static/js/main.a6b02404.js.map"
+    "main.550796b8.js.map": "/citizen-app/static/js/main.550796b8.js.map"
   },
   "entrypoints": [
     "static/css/main.0fb9c689.css",
-    "static/js/main.a6b02404.js"
+    "static/js/main.550796b8.js"
   ]
 }

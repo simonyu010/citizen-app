@@ -9,6 +9,7 @@ interface WritingItem {
 const WritingPractice: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [shuffled, setShuffled] = useState<WritingItem[]>([]);
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
 
   useEffect(() => {
     // Shuffle the writing data once on mount
@@ -16,6 +17,14 @@ const WritingPractice: React.FC = () => {
       .sort(() => Math.random() - 0.5);
     setShuffled(shuffledData);
     setCurrentIndex(0);
+
+    // Load voices
+    const loadVoices = () => {
+      const voicesList = window.speechSynthesis.getVoices();
+      setVoices(voicesList);
+    };
+    loadVoices();
+    window.speechSynthesis.onvoiceschanged = loadVoices;
   }, []);
 
   useEffect(() => {
@@ -30,6 +39,9 @@ const WritingPractice: React.FC = () => {
     if ('speechSynthesis' in window) {
       const utter = new window.SpeechSynthesisUtterance(sentence);
       utter.lang = 'en-US';
+      // Always use Google US English (en-US) if available
+      const voiceObj = voices.find(v => v.name === 'Google US English' && v.lang === 'en-US');
+      if (voiceObj) utter.voice = voiceObj;
       window.speechSynthesis.cancel();
       window.speechSynthesis.speak(utter);
     }
@@ -57,7 +69,6 @@ const WritingPractice: React.FC = () => {
   };
 
   if (shuffled.length === 0) return <div>Loading...</div>;
-
   return (
     <div className="writing-practice">
       <div
@@ -90,6 +101,6 @@ const WritingPractice: React.FC = () => {
       </div>
     </div>
   );
-};
+}
 
 export default WritingPractice;

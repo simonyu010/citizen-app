@@ -9,6 +9,7 @@ interface ReadingItem {
 const ReadingPractice: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [shuffled, setShuffled] = useState<ReadingItem[]>([]);
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
 
   useEffect(() => {
     // Shuffle the reading data once on mount
@@ -16,6 +17,14 @@ const ReadingPractice: React.FC = () => {
       .sort(() => Math.random() - 0.5);
     setShuffled(shuffledData);
     setCurrentIndex(0);
+
+    // Load voices
+    const loadVoices = () => {
+      const voicesList = window.speechSynthesis.getVoices();
+      setVoices(voicesList);
+    };
+    loadVoices();
+    window.speechSynthesis.onvoiceschanged = loadVoices;
   }, []);
 
   useEffect(() => {
@@ -29,6 +38,9 @@ const ReadingPractice: React.FC = () => {
     if ('speechSynthesis' in window) {
       const utter = new window.SpeechSynthesisUtterance(word);
       utter.lang = 'en-US';
+      // Always use Google US English (en-US) if available
+      const voiceObj = voices.find(v => v.name === 'Google US English' && v.lang === 'en-US');
+      if (voiceObj) utter.voice = voiceObj;
       window.speechSynthesis.cancel();
       window.speechSynthesis.speak(utter);
     }
@@ -52,6 +64,7 @@ const ReadingPractice: React.FC = () => {
 
   return (
     <div className="reading-practice">
+      <h2>跟我读</h2>
       <div
         className="word-box"
         style={{
@@ -82,6 +95,6 @@ const ReadingPractice: React.FC = () => {
       </div>
     </div>
   );
-};
+}
 
 export default ReadingPractice;
