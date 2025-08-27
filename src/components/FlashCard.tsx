@@ -11,40 +11,45 @@ interface FlashCardProps {
 }
 
 
-const speakText = (text: string) => {
-  if ('speechSynthesis' in window) {
-    const speak = () => {
-      const voices = window.speechSynthesis.getVoices();
-      const utter = new window.SpeechSynthesisUtterance(text);
-      utter.lang = 'en-US';
-      // Detect iOS (Safari engine)
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-      if (!isIOS) {
-        let voiceObj = voices.find(v => v.name === 'Aaron' && v.lang === 'en-US');
-        if (!voiceObj) {
-          voiceObj = voices.find(v => v.name === 'Nicky' && v.lang === 'en-US');
-        }
-        if (!voiceObj) {
-          voiceObj = voices.find(v => v.lang === 'en-US');
-        }
-        if (voiceObj) utter.voice = voiceObj;
-      }
-      // On iOS, do not set utter.voice (let system pick best voice)
-      window.speechSynthesis.cancel();
-      window.speechSynthesis.speak(utter);
-    };
-    if (window.speechSynthesis.getVoices().length === 0) {
-      window.speechSynthesis.onvoiceschanged = () => {
-        speak();
-      };
-      window.speechSynthesis.getVoices();
-    } else {
-      speak();
-    }
-  }
+const getVoiceName = (voice: SpeechSynthesisVoice | null, isIOS: boolean) => {
+  if (isIOS) return 'System Default';
+  if (!voice) return 'Unknown';
+  return voice.name || 'Unknown';
 };
 
 const FlashCard: React.FC<FlashCardProps> = ({ question, answer, translation, translationAnswer, showAnswer, onShowAnswer }) => {
+  const [currentVoiceName, setCurrentVoiceName] = useState<string>('');
+
+  const speakText = (text: string) => {
+    if ('speechSynthesis' in window) {
+      const speak = () => {
+        const voices = window.speechSynthesis.getVoices();
+        const utter = new window.SpeechSynthesisUtterance(text);
+        utter.lang = 'en-US';
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        let voiceObj: SpeechSynthesisVoice | null = null;
+        if (!isIOS) {
+          voiceObj = voices.find(v => v.name === 'Aaron' && v.lang === 'en-US') ||
+            voices.find(v => v.name === 'Nicky' && v.lang === 'en-US') ||
+            voices.find(v => v.lang === 'en-US') || null;
+          if (voiceObj) utter.voice = voiceObj;
+        }
+        setCurrentVoiceName(getVoiceName(voiceObj, isIOS));
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(utter);
+      };
+      if (window.speechSynthesis.getVoices().length === 0) {
+        window.speechSynthesis.onvoiceschanged = () => {
+          speak();
+        };
+        window.speechSynthesis.getVoices();
+      } else {
+        speak();
+      }
+    }
+  };
+
+
   // Handler for clicking the question
   const handleQuestionClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -72,6 +77,9 @@ const FlashCard: React.FC<FlashCardProps> = ({ question, answer, translation, tr
       >
         {question} / {translation}
       </h3>
+      <div style={{ fontSize: '0.95em', color: '#888', marginBottom: '0.5em' }}>
+        <span>Current Voice: {currentVoiceName || 'Not played yet'}</span>
+      </div>
       {showAnswer && (
         <div className="answer">
           <div style={{ display: 'flex', gap: '2em' }}>

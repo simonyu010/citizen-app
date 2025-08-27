@@ -10,6 +10,7 @@ const ReadingPractice: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [shuffled, setShuffled] = useState<ReadingItem[]>([]);
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const [currentVoiceName, setCurrentVoiceName] = useState<string>('');
 
   useEffect(() => {
     // Shuffle the reading data once on mount
@@ -39,6 +40,7 @@ const ReadingPractice: React.FC = () => {
       const utter = new window.SpeechSynthesisUtterance(word);
       utter.lang = 'en-US';
       const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      let voiceName = '';
       if (!isIOS) {
         let voiceObj = voices.find(v => v.name === 'Aaron' && v.lang === 'en-US');
         if (!voiceObj) {
@@ -47,8 +49,14 @@ const ReadingPractice: React.FC = () => {
         if (!voiceObj) {
           voiceObj = voices.find(v => v.lang === 'en-US');
         }
-        if (voiceObj) utter.voice = voiceObj;
+        if (voiceObj) {
+          utter.voice = voiceObj;
+          voiceName = voiceObj.name + ' (' + voiceObj.lang + ')';
+        }
+      } else {
+        voiceName = '系统默认';
       }
+      setCurrentVoiceName(voiceName);
       window.speechSynthesis.cancel();
       window.speechSynthesis.speak(utter);
     }
@@ -72,6 +80,9 @@ const ReadingPractice: React.FC = () => {
 
   return (
     <div className="reading-practice">
+      <div style={{ marginBottom: 8, color: '#888', fontSize: '0.95em', textAlign: 'center' }}>
+        当前语音: {currentVoiceName || '未播放'}
+      </div>
       <h2>跟我读</h2>
       <div
         className="word-box"
