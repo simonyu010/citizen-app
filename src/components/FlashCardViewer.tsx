@@ -18,12 +18,18 @@ const FlashCardViewer: React.FC = () => {
       const allVoices = synth.getVoices();
       const filtered = allVoices.filter(v => v.name === 'Aaron' || v.name === 'Google US English');
       setVoices(filtered);
-      setVoiceLoading(false);
       if (filtered.length > 0) {
+        setVoiceLoading(false);
         const saved = localStorage.getItem('selectedVoice');
         setSelectedVoice(saved && filtered.some(v => v.name === saved) ? saved : filtered[0].name);
       } else {
-        setVoiceError(true);
+        // Wait at least 2 seconds before showing error
+        setTimeout(() => {
+          if (synth.getVoices().filter(v => v.name === 'Aaron' || v.name === 'Google US English').length === 0) {
+            setVoiceLoading(false);
+            setVoiceError(true);
+          }
+        }, 2000);
       }
     };
     if (synth.getVoices().length === 0) {
