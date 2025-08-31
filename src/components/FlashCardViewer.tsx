@@ -19,7 +19,10 @@ const FlashCardViewer: React.FC = () => {
         setSelectedVoice(saved && filtered.some(v => v.name === saved) ? saved : filtered[0].name);
       }
     };
-    updateVoices();
+    // Dummy utterance to force voice loading
+    const dummy = new window.SpeechSynthesisUtterance('');
+    window.speechSynthesis.speak(dummy);
+    setTimeout(updateVoices, 1000);
     synth.onvoiceschanged = updateVoices;
     return () => { synth.onvoiceschanged = null; };
   }, []);
