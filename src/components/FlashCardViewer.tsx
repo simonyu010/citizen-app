@@ -7,24 +7,41 @@ const FlashCardViewer: React.FC = () => {
   const [showAnswerMap, setShowAnswerMap] = useState<{ [key: number]: boolean }>({});
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
   const [selectedVoice, setSelectedVoice] = useState<string>(() => localStorage.getItem('selectedVoice') || '');
+  const [voiceLoading, setVoiceLoading] = useState(true);
+  const [voiceError, setVoiceError] = useState(false);
 
-  useEffect(() => {
+  const loadVoices = () => {
+    setVoiceLoading(true);
+    setVoiceError(false);
     const synth = window.speechSynthesis;
     const updateVoices = () => {
       const allVoices = synth.getVoices();
       const filtered = allVoices.filter(v => v.name === 'Aaron' || v.name === 'Google US English');
       setVoices(filtered);
+      setVoiceLoading(false);
       if (filtered.length > 0) {
         const saved = localStorage.getItem('selectedVoice');
         setSelectedVoice(saved && filtered.some(v => v.name === saved) ? saved : filtered[0].name);
+      } else {
+        setVoiceError(true);
       }
     };
-    // Dummy utterance to force voice loading
-    const dummy = new window.SpeechSynthesisUtterance('');
-    window.speechSynthesis.speak(dummy);
-    setTimeout(updateVoices, 1000);
+    if (synth.getVoices().length === 0) {
+      // Dummy utterance to force voice loading
+      const dummy = new window.SpeechSynthesisUtterance('');
+      window.speechSynthesis.speak(dummy);
+      setTimeout(updateVoices, 2000);
+    } else {
+      updateVoices();
+    }
     synth.onvoiceschanged = updateVoices;
-    return () => { synth.onvoiceschanged = null; };
+  };
+
+  useEffect(() => {
+    loadVoices();
+    return () => {
+      window.speechSynthesis.onvoiceschanged = null;
+    };
   }, []);
 
   useEffect(() => {
@@ -44,6 +61,27 @@ const FlashCardViewer: React.FC = () => {
     setShowAnswerMap((prev) => ({ ...prev, [current.id]: true }));
   };
 
+  if (voiceLoading) {
+    return (
+      <div className="flashcard-viewer">
+        <h2>全部题目</h2>
+        <div style={{ margin: '18px 0', color: '#888', fontSize: '1.1em' }}>
+          正在加载语音选项...
+        </div>
+      </div>
+    );
+  }
+  if (voiceError) {
+    return (
+      <div className="flashcard-viewer">
+        <h2>全部题目</h2>
+        <div style={{ margin: '18px 0', color: '#d32f2f', fontSize: '1.1em' }}>
+          未能加载语音选项，请重试。
+          <button style={{ marginLeft: 12 }} onClick={loadVoices}>重试加载语音</button>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="flashcard-viewer">
       <div style={{ margin: '18px 0' }}>

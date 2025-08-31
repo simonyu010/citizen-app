@@ -15,24 +15,41 @@ interface FlashCardListProps {
 const FlashCardList: React.FC<FlashCardListProps> = ({ questions }) => {
   const [voices, setVoices] = React.useState<SpeechSynthesisVoice[]>([]);
   const [selectedVoice, setSelectedVoice] = React.useState<string>(() => localStorage.getItem('selectedVoice') || '');
+  const [voiceLoading, setVoiceLoading] = React.useState(true);
+  const [voiceError, setVoiceError] = React.useState(false);
 
-  React.useEffect(() => {
+  const loadVoices = () => {
+    setVoiceLoading(true);
+    setVoiceError(false);
     const synth = window.speechSynthesis;
     const updateVoices = () => {
       const allVoices = synth.getVoices();
       const filtered = allVoices.filter(v => v.name === 'Aaron' || v.name === 'Google US English');
       setVoices(filtered);
+      setVoiceLoading(false);
       if (filtered.length > 0) {
         const saved = localStorage.getItem('selectedVoice');
         setSelectedVoice(saved && filtered.some(v => v.name === saved) ? saved : filtered[0].name);
+      } else {
+        setVoiceError(true);
       }
     };
-    // Dummy utterance to force voice loading
-    const dummy = new window.SpeechSynthesisUtterance('');
-    window.speechSynthesis.speak(dummy);
-    setTimeout(updateVoices, 1000);
+    if (synth.getVoices().length === 0) {
+      // Dummy utterance to force voice loading
+      const dummy = new window.SpeechSynthesisUtterance('');
+      window.speechSynthesis.speak(dummy);
+      setTimeout(updateVoices, 2000);
+    } else {
+      updateVoices();
+    }
     synth.onvoiceschanged = updateVoices;
-    return () => { synth.onvoiceschanged = null; };
+  };
+
+  React.useEffect(() => {
+    loadVoices();
+    return () => {
+      window.speechSynthesis.onvoiceschanged = null;
+    };
   }, []);
 
   React.useEffect(() => {
@@ -43,6 +60,27 @@ const FlashCardList: React.FC<FlashCardListProps> = ({ questions }) => {
     setSelectedVoice(e.target.value);
   };
 
+  if (voiceLoading) {
+    return (
+      <div className="flash-card-list">
+        <h2>全部题目</h2>
+        <div style={{ margin: '18px 0', color: '#888', fontSize: '1.1em' }}>
+          正在加载语音选项...
+        </div>
+      </div>
+    );
+  }
+  if (voiceError) {
+    return (
+      <div className="flash-card-list">
+        <h2>全部题目</h2>
+        <div style={{ margin: '18px 0', color: '#d32f2f', fontSize: '1.1em' }}>
+          未能加载语音选项，请重试。
+          <button style={{ marginLeft: 12 }} onClick={loadVoices}>重试加载语音</button>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="flash-card-list">
       <div style={{ margin: '18px 0' }}>
