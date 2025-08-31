@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import identityQuestions from '../data/identityQuestions.json';
 import identityAnswers from '../data/identityAnswers.json';
 
@@ -11,17 +11,20 @@ interface IA {
   identityAnswers: string;
 }
 
-const speakText = (text: string) => {
+const speakText = (text: string, selectedVoice: string, voices: SpeechSynthesisVoice[]) => {
   if ('speechSynthesis' in window) {
-    const voices = window.speechSynthesis.getVoices();
+    const filtered = voices.filter(v =>
+      (v.name === 'Aaron' && v.lang === 'en-US') ||
+      (v.name.includes('Google US English') && v.lang === 'en-US')
+    );
     const utter = new window.SpeechSynthesisUtterance(text);
     utter.lang = 'en-US';
-    let googleVoice = voices.find(v => v.name.includes('Google US English') && v.lang === 'en-US');
-    if (!googleVoice) {
-      googleVoice = voices.find(v => v.lang === 'en-US');
+    let voiceObj = filtered.find(v => v.name === selectedVoice);
+    if (!voiceObj) {
+      voiceObj = filtered[0];
     }
-    if (googleVoice) {
-      utter.voice = googleVoice;
+    if (voiceObj) {
+      utter.voice = voiceObj;
     }
     window.speechSynthesis.cancel();
     window.speechSynthesis.speak(utter);
@@ -31,6 +34,20 @@ const speakText = (text: string) => {
 const ProfileViewer: React.FC = () => {
   const [index, setIndex] = useState(0);
   const [showAnswerMap, setShowAnswerMap] = useState<{ [key: number]: boolean }>({});
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const [selectedVoice, setSelectedVoice] = useState<string>(() => localStorage.getItem('selectedVoice') || '');
+  useEffect(() => {
+    const loadVoices = () => {
+      const voicesList = window.speechSynthesis.getVoices();
+      const filtered = voicesList.filter(v =>
+        (v.name === 'Aaron' && v.lang === 'en-US') ||
+        (v.name.includes('Google US English') && v.lang === 'en-US')
+      );
+      setVoices(filtered);
+    };
+    loadVoices();
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+  }, []);
 
   const handleNext = () => setIndex((prev) => (prev + 1) % identityQuestions.length);
   const handlePrev = () => setIndex((prev) => (prev - 1 + identityQuestions.length) % identityQuestions.length);
@@ -40,22 +57,46 @@ const ProfileViewer: React.FC = () => {
 
   const handleShowAnswer = (e: React.MouseEvent) => {
     e.stopPropagation();
-    speakText(currentQ.identityQuestions);
+    speakText(currentQ.identityQuestions, selectedVoice, voices);
     setShowAnswerMap((prev) => ({ ...prev, [currentQ.id]: true }));
   };
 
   const handleAnswerClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (currentA) speakText(currentA.identityAnswers);
+    if (currentA) speakText(currentA.identityAnswers, selectedVoice, voices);
+  };
+  const handleVoiceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedVoice(e.target.value);
+    localStorage.setItem('selectedVoice', e.target.value);
   };
 
   return (
     <div className="profile-viewer">
+      <div style={{ margin: '18px 0' }}>
+        <label htmlFor="voice-select">选择语音: </label>
+        <select
+          id="voice-select"
+          value={selectedVoice}
+          onChange={handleVoiceChange}
+          style={{ fontSize: '1em', padding: '0.3em', minWidth: 180 }}
+        >
+          {voices.map(v => (
+            <option key={v.name + v.lang} value={v.name}>
+              {v.name} ({v.lang})
+            </option>
+          ))}
+        </select>
+      </div>
       <div
         className="profile-question"
-        style={{ cursor: showAnswerMap[currentQ.id] ? 'default' : 'pointer', fontSize: '1.2em', color: '#800000', marginBottom: '1em', background: '#ffe6f7', padding: '1em', borderRadius: '10px' }}
-        title={showAnswerMap[currentQ.id] ? undefined : '点击题目显示答案并朗读'}
-        onClick={showAnswerMap[currentQ.id] ? undefined : handleShowAnswer}
+        style={{ cursor: 'pointer', fontSize: '1.2em', color: '#800000', marginBottom: '1em', background: '#ffe6f7', padding: '1em', borderRadius: '10px' }}
+        title={'点击题目朗读'}
+        onClick={(e) => {
+          speakText(currentQ.identityQuestions, selectedVoice, voices);
+          if (!showAnswerMap[currentQ.id]) {
+            setShowAnswerMap((prev) => ({ ...prev, [currentQ.id]: true }));
+          }
+        }}
       >
         {currentQ.identityQuestions}
       </div>

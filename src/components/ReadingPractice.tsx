@@ -11,6 +11,8 @@ const ReadingPractice: React.FC = () => {
   const [shuffled, setShuffled] = useState<ReadingItem[]>([]);
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
   const [currentVoiceName, setCurrentVoiceName] = useState<string>('');
+  // Removed duplicate declaration of voices
+  const [selectedVoice, setSelectedVoice] = useState<string>(() => localStorage.getItem('selectedVoice') || '');
 
   useEffect(() => {
     // Shuffle the reading data once on mount
@@ -22,7 +24,11 @@ const ReadingPractice: React.FC = () => {
     // Load voices
     const loadVoices = () => {
       const voicesList = window.speechSynthesis.getVoices();
-      setVoices(voicesList);
+      const filtered = voicesList.filter(v =>
+        (v.name === 'Aaron' && v.lang === 'en-US') ||
+        (v.name.includes('Google US English') && v.lang === 'en-US')
+      );
+      setVoices(filtered);
     };
     loadVoices();
     window.speechSynthesis.onvoiceschanged = loadVoices;
@@ -37,16 +43,15 @@ const ReadingPractice: React.FC = () => {
 
     const speakWord = (word: string) => {
       if ('speechSynthesis' in window) {
-        const voices = window.speechSynthesis.getVoices();
         const utter = new window.SpeechSynthesisUtterance(word);
         utter.lang = 'en-US';
-        let googleVoice = voices.find(v => v.name.includes('Google US English') && v.lang === 'en-US');
-        if (!googleVoice) {
-          googleVoice = voices.find(v => v.lang === 'en-US');
+        let voiceObj = voices.find(v => v.name === selectedVoice);
+        if (!voiceObj) {
+          voiceObj = voices[0];
         }
-        if (googleVoice) {
-          utter.voice = googleVoice;
-          setCurrentVoiceName(googleVoice.name);
+        if (voiceObj) {
+          utter.voice = voiceObj;
+          setCurrentVoiceName(voiceObj.name);
         } else {
           setCurrentVoiceName('System Default');
         }
@@ -71,8 +76,28 @@ const ReadingPractice: React.FC = () => {
 
   if (shuffled.length === 0) return <div>Loading...</div>;
 
+  const handleVoiceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedVoice(e.target.value);
+    localStorage.setItem('selectedVoice', e.target.value);
+  };
+
   return (
     <div className="reading-practice">
+      <div style={{ margin: '18px 0' }}>
+        <label htmlFor="voice-select">选择语音: </label>
+        <select
+          id="voice-select"
+          value={selectedVoice}
+          onChange={handleVoiceChange}
+          style={{ fontSize: '1em', padding: '0.3em', minWidth: 180 }}
+        >
+          {voices.map(v => (
+            <option key={v.name + v.lang} value={v.name}>
+              {v.name} ({v.lang})
+            </option>
+          ))}
+        </select>
+      </div>
       <div style={{ marginBottom: 8, color: '#888', fontSize: '0.95em', textAlign: 'center' }}>
         当前语音: {currentVoiceName || '未播放'}
       </div>

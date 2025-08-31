@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
 
+
+import React, { useState, useEffect } from 'react';
 
 interface FlashCardProps {
   question: string;
@@ -8,52 +9,44 @@ interface FlashCardProps {
   translationAnswer: string | string[];
   showAnswer: boolean;
   onShowAnswer: () => void;
+  voices: SpeechSynthesisVoice[];
+  selectedVoice: string;
 }
 
-
-const getVoiceName = (voice: SpeechSynthesisVoice | null, isIOS: boolean) => {
-  if (isIOS) return 'System Default';
-  if (!voice) return 'Unknown';
-  return voice.name || 'Unknown';
-};
-
-const FlashCard: React.FC<FlashCardProps> = ({ question, answer, translation, translationAnswer, showAnswer, onShowAnswer }) => {
-  const [currentVoiceName, setCurrentVoiceName] = useState<string>('');
+const FlashCard: React.FC<FlashCardProps> = ({
+  question,
+  answer,
+  translation,
+  translationAnswer,
+  showAnswer,
+  onShowAnswer,
+  voices,
+  selectedVoice,
+}) => {
+  // Remove local voice state, use props instead
 
   const speakText = (text: string) => {
-    if ('speechSynthesis' in window) {
-      const voices = window.speechSynthesis.getVoices();
-      const utter = new window.SpeechSynthesisUtterance(text);
-      utter.lang = 'en-US';
-      let googleVoice = voices.find(v => v.name.includes('Google US English') && v.lang === 'en-US');
-      if (!googleVoice) {
-        googleVoice = voices.find(v => v.lang === 'en-US');
-      }
-      if (googleVoice) {
-        utter.voice = googleVoice;
-        setCurrentVoiceName(googleVoice.name);
-      } else {
-        setCurrentVoiceName('System Default');
-      }
-      window.speechSynthesis.cancel();
-      window.speechSynthesis.speak(utter);
-    }
+    if (!text) return;
+    const synth = window.speechSynthesis;
+    const voice = voices.find(v => v.name === selectedVoice) || voices[0];
+    if (!voice) return;
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.voice = voice;
+    synth.cancel();
+    synth.speak(utter);
   };
 
-
-  // Handler for clicking the question
-  const handleQuestionClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleQuestionClick = () => {
     speakText(question);
-    onShowAnswer();
+    if (!showAnswer) onShowAnswer();
   };
 
-  // Handler for clicking the answer
   const handleAnswerClick = (ans: string, e: React.MouseEvent) => {
     e.stopPropagation();
     speakText(ans);
   };
 
+  // Remove dropdown and voice display from FlashCard
   return (
     <div
       className={`flashcard${showAnswer ? ' show-answer' : ''}`}
@@ -62,15 +55,12 @@ const FlashCard: React.FC<FlashCardProps> = ({ question, answer, translation, tr
       aria-pressed={showAnswer}
     >
       <h3
-        style={{ cursor: showAnswer ? 'default' : 'pointer' }}
-        title={showAnswer ? undefined : '点击题目显示答案并朗读'}
-        onClick={showAnswer ? undefined : handleQuestionClick}
+        style={{ cursor: 'pointer' }}
+        title={'点击题目朗读'}
+        onClick={handleQuestionClick}
       >
         {question} / {translation}
       </h3>
-      <div style={{ fontSize: '0.95em', color: '#888', marginBottom: '0.5em' }}>
-        <span>Current Voice: {currentVoiceName || 'Not played yet'}</span>
-      </div>
       {showAnswer && (
         <div className="answer">
           <div style={{ display: 'flex', gap: '2em' }}>
@@ -78,7 +68,7 @@ const FlashCard: React.FC<FlashCardProps> = ({ question, answer, translation, tr
               <strong>English:</strong>
               <ul style={{ margin: 0, paddingLeft: '1.2em' }}>
                 {Array.isArray(answer)
-                  ? answer.map((ans, idx) => (
+                  ? (answer as string[]).map((ans: string, idx: number) => (
                       <li
                         key={idx}
                         style={{ cursor: 'pointer' }}
@@ -103,7 +93,7 @@ const FlashCard: React.FC<FlashCardProps> = ({ question, answer, translation, tr
               <strong>中文:</strong>
               <ul style={{ margin: 0, paddingLeft: '1.2em' }}>
                 {Array.isArray(translationAnswer)
-                  ? translationAnswer.map((ans, idx) => <li key={idx}>{ans}</li>)
+                  ? (translationAnswer as string[]).map((ans: string, idx: number) => <li key={idx}>{ans}</li>)
                   : <li>{translationAnswer}</li>}
               </ul>
             </div>

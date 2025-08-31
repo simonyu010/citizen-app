@@ -77,14 +77,15 @@ const App: React.FC = () => {
             <button onClick={() => setRandomKey(k => k + 1)}>
               再来10题
             </button>
-            <button onClick={() => setMode('writing')}>
+            {/* <button onClick={() => setMode('writing')}>
               我读你写
             </button>
             <button onClick={() => setMode('reading')}>
               跟我读
-            </button>
+            </button> */}
           </>
         )}
+        {/*
         {mode === 'writing' && (
           <button onClick={() => setMode('reading')}>
             跟我读
@@ -105,6 +106,7 @@ const App: React.FC = () => {
             </button>
           </>
         )}
+        */}
       </div>
       {/* Password prompt modal */}
       {showPasswordPrompt && (
