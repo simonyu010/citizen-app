@@ -35,18 +35,18 @@ const speakText = (text: string) => {
 };
 
 const FlashCard: React.FC<FlashCardProps> = ({ question, answer, translation, translationAnswer, showAnswer, onShowAnswer }) => {
-  // Handler for clicking the question
+  // Handler for clicking the question (always reads, always shows answer)
   const handleQuestionClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     speakText(question);
-    onShowAnswer();
-  };
+    if (!showAnswer) onShowAnswer();
+  } 
 
-  // Handler for clicking the answer
+  // Handler for clicking the answer (always reads)
   const handleAnswerClick = (ans: string, e: React.MouseEvent) => {
     e.stopPropagation();
     speakText(ans);
-  };
+  } 
 
   return (
     <div
@@ -56,9 +56,9 @@ const FlashCard: React.FC<FlashCardProps> = ({ question, answer, translation, tr
       aria-pressed={showAnswer}
     >
       <h3
-        style={{ cursor: showAnswer ? 'default' : 'pointer' }}
-        title={showAnswer ? undefined : '点击题目显示答案并朗读'}
-        onClick={showAnswer ? undefined : handleQuestionClick}
+        style={{ cursor: 'pointer' }}
+        title={'点击题目朗读（首次点击显示答案）'}
+        onClick={handleQuestionClick}
       >
         {question} / {translation}
       </h3>
