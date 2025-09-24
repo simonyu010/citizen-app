@@ -47,8 +47,6 @@ const RandomTenFlashCardWrapper: React.FC<{ question: any }> = ({ question }) =>
         <FlashCard
             question={question.question}
             answer={question.answer}
-            translation={question.translation}
-            translationAnswer={question.translation_answer}
             showAnswer={showAnswer}
             onShowAnswer={() => setShowAnswer(true)}
         />

@@ -4,8 +4,6 @@ import React, { useState } from 'react';
 interface FlashCardProps {
   question: string;
   answer: string | string[];
-  translation: string;
-  translationAnswer: string | string[];
   showAnswer: boolean;
   onShowAnswer: () => void;
 }
@@ -34,7 +32,7 @@ const speakText = (text: string) => {
   }
 };
 
-const FlashCard: React.FC<FlashCardProps> = ({ question, answer, translation, translationAnswer, showAnswer, onShowAnswer }) => {
+const FlashCard: React.FC<FlashCardProps> = ({ question, answer, showAnswer, onShowAnswer }) => {
   // Handler for clicking the question (always reads, always shows answer)
   const handleQuestionClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -56,49 +54,37 @@ const FlashCard: React.FC<FlashCardProps> = ({ question, answer, translation, tr
       aria-pressed={showAnswer}
     >
       <h3
-        style={{ cursor: 'pointer' }}
-        title={'点击题目朗读（首次点击显示答案）'}
+        style={{ cursor: 'pointer', marginBottom: '1em', fontSize: '1.2em' }}
+        title={'Click to read question (first click shows answer)'}
         onClick={handleQuestionClick}
       >
-        {question} / {translation}
+        {question}
       </h3>
       {showAnswer && (
-        <div className="answer">
-          <div style={{ display: 'flex', gap: '2em' }}>
-            <div>
-              <strong>English:</strong>
-              <ul style={{ margin: 0, paddingLeft: '1.2em' }}>
-                {Array.isArray(answer)
-                  ? answer.map((ans, idx) => (
-                      <li
-                        key={idx}
-                        style={{ cursor: 'pointer' }}
-                        title="点击朗读答案"
-                        onClick={e => handleAnswerClick(ans, e)}
-                      >
-                        {ans}
-                      </li>
-                    ))
-                  : (
-                      <li
-                        style={{ cursor: 'pointer' }}
-                        title="点击朗读答案"
-                        onClick={e => handleAnswerClick(answer as string, e)}
-                      >
-                        {answer}
-                      </li>
-                    )}
-              </ul>
-            </div>
-            <div>
-              <strong>中文:</strong>
-              <ul style={{ margin: 0, paddingLeft: '1.2em' }}>
-                {Array.isArray(translationAnswer)
-                  ? translationAnswer.map((ans, idx) => <li key={idx}>{ans}</li>)
-                  : <li>{translationAnswer}</li>}
-              </ul>
-            </div>
-          </div>
+        <div className="answer" style={{ marginBottom: '1em' }}>
+          <strong>Answer:</strong>
+          <ul style={{ margin: 0, paddingLeft: '1.2em' }}>
+            {Array.isArray(answer)
+              ? answer.map((ans, idx) => (
+                  <li
+                    key={idx}
+                    style={{ cursor: 'pointer' }}
+                    title="Click to read answer"
+                    onClick={e => handleAnswerClick(ans, e)}
+                  >
+                    {ans}
+                  </li>
+                ))
+              : (
+                  <li
+                    style={{ cursor: 'pointer' }}
+                    title="Click to read answer"
+                    onClick={e => handleAnswerClick(answer as string, e)}
+                  >
+                    {answer}
+                  </li>
+                )}
+          </ul>
         </div>
       )}
     </div>

@@ -20,8 +20,6 @@ const FlashCardViewer: React.FC = () => {
       <FlashCard
         question={current.question}
         answer={current.answer}
-        translation={current.translation}
-        translationAnswer={current.translation_answer}
         showAnswer={!!showAnswerMap[current.id]}
         onShowAnswer={handleShowAnswer}
       />

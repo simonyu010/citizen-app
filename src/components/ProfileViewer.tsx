@@ -58,9 +58,9 @@ const ProfileViewer: React.FC = () => {
     <div className="profile-viewer">
       <div
         className="profile-question"
-        style={{ cursor: showAnswerMap[currentQ.id] ? 'default' : 'pointer', fontSize: '1.2em', color: '#800000', marginBottom: '1em', background: '#ffe6f7', padding: '1em', borderRadius: '10px' }}
-        title={showAnswerMap[currentQ.id] ? undefined : '点击题目显示答案并朗读'}
-        onClick={showAnswerMap[currentQ.id] ? undefined : handleShowAnswer}
+        style={{ cursor: 'pointer', fontSize: '1.2em', color: '#800000', marginBottom: '1em', background: '#ffe6f7', padding: '1em', borderRadius: '10px' }}
+        title={'Click to read question (first click shows answer)'}
+        onClick={handleShowAnswer}
       >
         {currentQ.identityQuestions}
       </div>
@@ -68,10 +68,10 @@ const ProfileViewer: React.FC = () => {
         <div
           className="profile-answer"
           style={{ cursor: 'pointer', fontSize: '1.1em', color: '#6a1b9a', background: '#f3e5f5', padding: '1em', borderRadius: '10px', marginBottom: '1em' }}
-          title="点击朗读答案"
+          title="Click to read answer"
           onClick={handleAnswerClick}
         >
-          {currentA ? currentA.identityAnswers : '无答案'}
+          {currentA ? currentA.identityAnswers : 'No answer'}
         </div>
       )}
       <div style={{ marginTop: 16 }}>

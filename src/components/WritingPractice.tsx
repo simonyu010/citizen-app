@@ -88,8 +88,8 @@ const WritingPractice: React.FC = () => {
           overflowWrap: 'break-word',
           cursor: 'pointer',
         }}
-        onClick={() => speakSentence(shuffled[currentIndex].write)}
-        title="点击句子再听一次"
+  onClick={() => speakSentence(shuffled[currentIndex].write)}
+  title="Click to hear the sentence again"
       >
         <span style={{ fontSize: '1.2em', color: '#333', fontWeight: 500, lineHeight: 1.5, display: 'block' }}>
           {shuffled[currentIndex].write}

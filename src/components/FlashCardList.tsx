@@ -27,12 +27,10 @@ const FlashCardListItem: React.FC<{ question: Question }> = ({ question }) => {
   const [showAnswer, setShowAnswer] = React.useState(false);
   return (
     <FlashCard
-      question={question.question}
-      answer={question.answer}
-      translation={question.translation}
-      translationAnswer={question.translation_answer}
-      showAnswer={showAnswer}
-      onShowAnswer={() => setShowAnswer(true)}
+  question={question.question}
+  answer={question.answer}
+  showAnswer={showAnswer}
+  onShowAnswer={() => setShowAnswer(true)}
     />
   );
 };

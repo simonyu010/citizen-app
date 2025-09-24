@@ -64,7 +64,7 @@ const ReadingPractice: React.FC = () => {
 
   return (
     <div className="reading-practice">
-      <h2>跟我读</h2>
+  <h2>Reading Practice</h2>
       <div
         className="word-box"
         style={{
@@ -82,16 +82,16 @@ const ReadingPractice: React.FC = () => {
           overflowWrap: 'break-word',
           cursor: 'pointer',
         }}
-        onClick={() => speakWord(shuffled[currentIndex].read)}
-        title="点击单词再读一遍"
+  onClick={() => speakWord(shuffled[currentIndex].read)}
+  title="Click to hear the word again"
       >
         <span style={{ fontSize: '1.4em', color: '#333', fontWeight: 500, lineHeight: 1.5, display: 'block' }}>
           {shuffled[currentIndex].read}
         </span>
       </div>
       <div style={{ marginTop: 20, display: 'flex', gap: '10px', justifyContent: 'center' }}>
-        <button onClick={handlePrev}>上个词</button>
-        <button onClick={handleNext}>下个词</button>
+  <button onClick={handlePrev}>Previous Word</button>
+  <button onClick={handleNext}>Next Word</button>
       </div>
     </div>
   );
